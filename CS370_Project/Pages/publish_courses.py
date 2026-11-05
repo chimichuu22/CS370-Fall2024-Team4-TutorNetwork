@@ -3,6 +3,13 @@ import datetime
 import streamlit as st
 from session_store import publish, slots
 
+st.set_page_config(
+    page_title="TutorHub",
+    page_icon="🎓",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
 st.title("📚 Publish Courses & Availability")
 
 st.write(

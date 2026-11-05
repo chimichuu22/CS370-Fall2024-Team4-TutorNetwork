@@ -1,7 +1,12 @@
 
 import streamlit as st
 from session_store import requests, decide
-
+st.set_page_config(
+    page_title="TutorHub",
+    page_icon="🎓",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 st.title("📩 Student Requests")
 
 st.write(

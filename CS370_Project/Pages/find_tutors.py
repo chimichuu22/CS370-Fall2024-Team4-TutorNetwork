@@ -2,18 +2,27 @@
 import streamlit as st
 from session_store import slots, requests, submit
 
+st.set_page_config(
+    page_title="TutorHub",
+    page_icon="🎓",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
 st.title("🔎 Find Tutors")
 st.write("Search for tutors based on your course.")
 
 if "selected_tutor" not in st.session_state:
     st.session_state.selected_tutor = None
 
+# Search filters
 search = st.text_input(
     "Search for a course",
     placeholder="Example: CS 370"
 )
 
 date_op = st.date_input("Pick a date", value=None)
+
 time_op = st.time_input(
     "Pick a time",
     value=None,
@@ -30,12 +39,16 @@ selected = next(
     None
 )
 
-# Tutor profile
+# ------------------------------------------
+# Tutor Profile
+# ------------------------------------------
+
 if selected:
     st.subheader("👩‍🏫 Tutor Profile")
 
     if st.button("← Back to Find Tutors"):
         st.session_state.selected_tutor = None
+        st.session_state.pop("just_submitted_slot", None)
         st.rerun()
 
     st.header(selected["name"])
@@ -58,6 +71,7 @@ if selected:
         selected["time"].strftime("%I:%M %p")
     )
 
+    # Find an existing active request
     active = next(
         (
             request for request in requests()
@@ -68,13 +82,32 @@ if selected:
     )
 
     if active:
-        st.info(
-            f"Request Status: {active['status'].upper()}"
-        )
+        if active["status"] == "Pending":
+            st.warning(
+                "Request Status: PENDING",
+                icon="⏳"
+            )
+
+            st.write(
+                "Your tutoring request has been submitted "
+                "and is waiting for the tutor's response."
+            )
+
+            st.success(
+                "Your tutoring request was successfully submitted!",
+                icon=None
+            )
+
+        elif active["status"] == "Accepted":
+            st.success("Request Status: ACCEPTED")
+
+        elif active["status"] == "Declined":
+            st.error("Request Status: DECLINED")
 
     else:
+        # Student can request an available session
         student_name = st.text_input(
-            "Your name (demo; no login required)",
+            "Your Name",
             value="Demo Student"
         )
 
@@ -85,12 +118,15 @@ if selected:
             ok, message = submit(selected, student_name)
 
             if ok:
-                st.success(message)
+                st.session_state["just_submitted_slot"] = selected["id"]
                 st.rerun()
             else:
                 st.warning(message)
 
-# Search results
+# ------------------------------------------
+# Search Results
+# ------------------------------------------
+
 else:
     st.subheader("Available Tutors")
 
@@ -144,7 +180,10 @@ else:
             "Sorry! No tutor is available for this time or course."
         )
 
-# Sidebar navigation
+# ------------------------------------------
+# Sidebar Navigation
+# ------------------------------------------
+
 with st.sidebar:
     st.title("🎓 TutorHub")
     st.write("Your campus tutoring network")
@@ -169,4 +208,3 @@ with st.sidebar:
         use_container_width=True
     ):
         st.switch_page("pages/tutor_dashboard.py")
-

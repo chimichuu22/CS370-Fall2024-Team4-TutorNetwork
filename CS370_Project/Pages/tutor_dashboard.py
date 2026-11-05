@@ -2,7 +2,12 @@
 import streamlit as st
 from datetime import datetime
 from session_store import requests
-
+st.set_page_config(
+    page_title="TutorHub",
+    page_icon="🎓",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 st.title("Welcome to Tutor Hub!")
 
 st.write(
