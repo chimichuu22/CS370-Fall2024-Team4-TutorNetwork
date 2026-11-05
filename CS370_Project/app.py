@@ -42,8 +42,6 @@ with st.sidebar:
     st.write("Your campus tutoring network")
     st.divider()
 
-    st.subheader("Navigation")
-
     if st.button("🔎 Find Tutors", use_container_width=True):
         st.switch_page("pages/find_tutors.py")
 
